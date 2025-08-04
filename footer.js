@@ -1,6 +1,6 @@
 // Footer Configuration
 const FOOTER_CONFIG = {
-    author: "BDK234",
+    author: "BDK234/KONYOL_MILITIA",
     year: new Date().getFullYear(),
     customText: null // Set custom text if needed
 };
