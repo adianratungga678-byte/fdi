@@ -47,7 +47,7 @@ const MENU_CONFIG = {
         },
         {
             id: "community",
-            href: "https://chat.whatsapp.com/ENKOwJcYQTa8irIuybrxfc?mode=ac_t",
+            href: "",
             icon: "community",
             title: "Join Komunitas",
             subtitle: "WhatsApp Group",
