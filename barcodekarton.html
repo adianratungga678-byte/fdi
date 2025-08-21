@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode Generator Beli Pcs Banyak</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"></script>
+</head>
+<body>
+    <!-- Menu will be loaded by menu.js -->
+    <div id="menu-container"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🏷️ Barcode Generator Beli Banyak</h1>
+            <p>Generate barcode dengan format PLU & QTY</p>
+        </div>
+
+        <div class="form-container">
+            <div class="input-group">
+                <label for="plu">🏷️ MASUKAN PLU:</label>
+                <input type="text" id="plu" placeholder="Contoh: 10008989" maxlength="8">
+            </div>
+
+            <div class="input-group">
+                <label for="qty">📦 MASUKAN QTY (pcs):</label>
+                <input type="number" id="qty" placeholder="Contoh: 12" min="1" max="9999">
+            </div>
+
+            <button class="generate-btn" onclick="generateBarcode()">
+                Generate Barcode
+            </button>
+
+            <div id="error-message"></div>
+
+            <div id="result" class="result-container">
+                <div class="barcode-display">
+                    <svg id="barcode"></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer will be loaded by footer.js -->
+    <div id="footer-container"></div>
+
+    <!-- Load External Scripts -->
+    <script src="menu.js"></script>
+    <script src="footer.js"></script>
+    <script>
+        function validateInput(plu, qty) {
+            const errors = [];
+            
+            if (!plu) {
+                errors.push("PLU tidak boleh kosong");
+            } else if (!/^\d{8}$/.test(plu)) {
+                errors.push("PLU harus berupa 8 digit angka");
+            }
+            
+            if (!qty) {
+                errors.push("QTY tidak boleh kosong");
+            } else {
+                const qtyNum = parseInt(qty);
+                if (isNaN(qtyNum) || qtyNum < 1 || qtyNum > 9999) {
+                    errors.push("QTY harus berupa angka 1-9999");
+                }
+            }
+            
+            return errors;
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.innerHTML = `<div class="error">${message}</div>`;
+            setTimeout(() => {
+                errorDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        function generateBarcode() {
+            const plu = document.getElementById('plu').value.trim();
+            const qty = document.getElementById('qty').value.trim();
+            
+            const errors = validateInput(plu, qty);
+            
+            if (errors.length > 0) {
+                showError(errors.join('<br>'));
+                return;
+            }
+            
+            // Format QTY menjadi 4 digit dengan leading zeros
+            const formattedQty = qty.padStart(4, '0');
+            const barcodeText = 'B' + plu + formattedQty;
+            
+            try {
+                // Generate barcode menggunakan JsBarcode
+                JsBarcode("#barcode", barcodeText, {
+                    format: "CODE128",
+                    width: 1.5,
+                    height: 80,
+                    displayValue: true,
+                    fontSize: 14,
+                    margin: 10,
+                    marginTop: 10,
+                    marginBottom: 5
+                });
+                
+                document.getElementById('result').style.display = 'block';
+                
+                // Scroll ke hasil
+                document.getElementById('result').scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+                
+            } catch (error) {
+                showError('Gagal membuat barcode. Silakan coba lagi.');
+                console.error('Barcode generation error:', error);
+            }
+        }
+
+        function clearResult() {
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('plu').value = '';
+            document.getElementById('qty').value = '';
+            document.getElementById('error-message').innerHTML = '';
+        }
+
+        // Auto-format input
+        document.getElementById('plu').addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '').slice(0, 8);
+        });
+
+        document.getElementById('qty').addEventListener('input', function(e) {
+            const value = parseInt(this.value);
+            if (value > 9999) {
+                this.value = 9999;
+            }
+        });
+
+        // Enter key support
+        document.getElementById('plu').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('qty').focus();
+            }
+        });
+
+        document.getElementById('qty').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateBarcode();
+            }
+        });
+
+        // Wait for menu to load before setting active state
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set timeout to ensure menu is loaded
+            setTimeout(() => {
+                // Set active menu item for this page
+                const menuItems = document.querySelectorAll('.menu-item');
+                menuItems.forEach(item => {
+                    item.classList.remove('active');
+                    // Add active class to "Barcode Karton" menu item
+                    if (item.textContent.includes('Barcode Karton')) {
+                        item.classList.add('active');
+                    }
+                });
+            }, 100);
+        });
+    </script>
+</body>
+</html>

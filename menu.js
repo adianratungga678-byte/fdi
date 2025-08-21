@@ -1,0 +1,199 @@
+// Menu Configuration
+const MENU_CONFIG = {
+    title: "Barcode Generator Suite",
+    subtitle: "by BDK234",
+    logo: "BDK",
+    version: "1.0",
+    year: "2024",
+    items: [
+        {
+            id: "plu-generator",
+            href: "index.html",
+            icon: "home",
+            title: "PLU Barcode Generator",
+            subtitle: "(Soon)"
+        },
+        {
+            id: "barcode-karton",
+            href: "barcodekarton.html",
+            icon: "box",
+            title: "Barcode Karton/Pcs"
+        },
+        {
+            id: "Scan-qr",
+            href: "scane.html",
+            icon: "qr-scan",
+            title: "Scan QR Via Web",
+            subtitle: "(Soon)"
+        },
+        {
+            id: "Mail-generate",
+            href: "proton.html",
+            icon: "mail",
+            title: "Mail Generator"
+        },
+         {
+            id: "sale-calc",
+            href: "sale.html",
+            icon: "money",
+            title: "Kalkukator Sales"
+        },
+        {
+            id: "custom-barcode",
+            href: "#",
+            icon: "barcode",
+            title: "Custom Barcode",
+            subtitle: "(Soon)"
+        },
+        {
+            id: "community",
+            href: "https://chat.whatsapp.com/ENKOwJcYQTa8irIuybrxfc?mode=ac_t",
+            icon: "community",
+            title: "Join Komunitas",
+            subtitle: "WhatsApp Group",
+            external: true
+        }
+    ]
+};
+
+// Menu Functions
+function toggleMenu() {
+    const menu = document.getElementById('slideMenu');
+    const overlay = document.getElementById('menuOverlay');
+    const menuButton = document.querySelector('.menu-toggle');
+    
+    if (menu.classList.contains('open')) {
+        closeMenu();
+    } else {
+        openMenu();
+    }
+}
+
+function openMenu() {
+    const menu = document.getElementById('slideMenu');
+    const overlay = document.getElementById('menuOverlay');
+    const menuButton = document.querySelector('.menu-toggle');
+    
+    menu.classList.add('open');
+    overlay.classList.add('open');
+    // SEMBUNYIKAN tombol menu ketika slide menu terbuka
+    menuButton.classList.add('hidden');
+}
+
+function closeMenu() {
+    const menu = document.getElementById('slideMenu');
+    const overlay = document.getElementById('menuOverlay');
+    const menuButton = document.querySelector('.menu-toggle');
+    
+    menu.classList.remove('open');
+    overlay.classList.remove('open');
+    // TAMPILKAN kembali tombol menu ketika slide menu tertutup
+    menuButton.classList.remove('hidden');
+}
+
+// Generate Menu HTML
+function generateMenuHTML() {
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    
+    return `
+        <!-- Menu Toggle Button -->
+        <button class="menu-toggle no-print" onclick="toggleMenu()">☰ Menu</button>
+
+        <!-- Slide Menu -->
+        <div class="slide-menu no-print" id="slideMenu">
+            <div class="menu-header">
+                <div class="menu-logo">${MENU_CONFIG.logo}</div>
+                <h3 class="menu-title">${MENU_CONFIG.title}</h3>
+                <p class="menu-subtitle">${MENU_CONFIG.subtitle}</p>
+            </div>
+            
+            <nav class="menu-nav">
+                ${MENU_CONFIG.items.map(item => `
+                    <a href="${item.href}" 
+                       class="menu-item ${currentPage === item.href ? 'active' : ''} ${item.external ? 'external-link' : ''}"
+                       ${item.external ? 'target="_blank" rel="noopener noreferrer"' : ''}>
+                        <div class="menu-icon ${item.icon}"></div>
+                        ${item.title}
+                        ${item.subtitle ? `<br><small>${item.subtitle}</small>` : ''}
+                        ${item.external ? '<span class="external-indicator">↗</span>' : ''}
+                    </a>
+                `).join('')}
+            </nav>
+            
+            <div class="menu-footer">
+                © ${MENU_CONFIG.year} ${MENU_CONFIG.subtitle.replace('by ', '')}<br>
+                Version ${MENU_CONFIG.version}
+            </div>
+        </div>
+
+        <!-- Menu Overlay -->
+        <div class="menu-overlay no-print" id="menuOverlay" onclick="closeMenu()"></div>
+    `;
+}
+
+// Initialize Menu
+function initializeMenu() {
+    // Inject menu HTML at the beginning of body
+    document.body.insertAdjacentHTML('afterbegin', generateMenuHTML());
+    
+    // Add event listeners
+    setupMenuEventListeners();
+}
+
+// Setup Event Listeners
+function setupMenuEventListeners() {
+    // Close menu when clicking on menu links
+    document.querySelectorAll('.menu-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+            // Don't close menu for current page link or disabled links
+            if (!this.classList.contains('active') && this.getAttribute('href') !== '#') {
+                // For external links, close menu after a short delay to allow navigation
+                if (this.classList.contains('external-link')) {
+                    setTimeout(() => closeMenu(), 100);
+                } else {
+                    closeMenu();
+                }
+            }
+        });
+    });
+
+    // Close menu on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeMenu();
+        }
+    });
+
+    // Close menu with swipe down gesture (for mobile)
+    const slideMenu = document.getElementById('slideMenu');
+    let startY = 0;
+    let currentY = 0;
+
+    slideMenu.addEventListener('touchstart', function(e) {
+        startY = e.touches[0].clientY;
+    });
+
+    slideMenu.addEventListener('touchmove', function(e) {
+        currentY = e.touches[0].clientY;
+        const diff = currentY - startY;
+        
+        // If swipe down more than 100px, close menu
+        if (diff > 100) {
+            closeMenu();
+        }
+    });
+}
+
+// Auto-initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initializeMenu();
+});
+
+// Export functions for manual use if needed
+window.MenuManager = {
+    toggle: toggleMenu,
+    open: openMenu,
+    close: closeMenu,
+    initialize: initializeMenu,
+    config: MENU_CONFIG
+};

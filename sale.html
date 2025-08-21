@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring Total Belanjaan</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="menu.js"></script>
+    <script src="footer.js"></script>
+    <style>
+        /* Menu Styles */
+        .menu-toggle {
+            position: fixed !important;
+            top: 20px !important;
+            left: 20px !important;
+            z-index: 1001 !important;
+            background: #333 !important;
+            color: white !important;
+            border: none !important;
+            padding: 10px 15px !important;
+            border-radius: 5px !important;
+            cursor: pointer !important;
+            font-size: 16px !important;
+            transition: opacity 0.3s ease, transform 0.3s ease !important;
+            opacity: 1 !important;
+            transform: scale(1) !important;
+            width: auto !important;
+            margin: 0 !important;
+            margin-left: 0 !important;
+        }
+
+        .menu-toggle:hover {
+            background: #555 !important;
+        }
+
+        .menu-toggle.hidden {
+            opacity: 0 !important;
+            transform: scale(0.8) !important;
+            pointer-events: none !important;
+        }
+
+        /* CSS untuk halaman monitoring belanjaan */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 10px;
+            background-color: #f5f5f5;
+            padding: 0;
+        }
+        .total-row {
+            background-color: white !important;
+            color: black !important;
+            font-weight: bold;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .input-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .input-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 0px;
+            flex-wrap: wrap;
+        }
+        .input-group {
+            flex: 1;
+            min-width: 150px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="date"], input[type="time"], input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        
+        /* Button styling - kecuali menu-toggle */
+        button:not(.menu-toggle) {
+            background: #28a745;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        
+        button:not(.menu-toggle):hover {
+            background: #218838;
+        }
+        
+        button.reset {
+            background: #dc3545;
+            margin-left: 10px;
+        }
+        
+        button.reset:hover {
+            background: #c82333;
+            transform: scale(1.02);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #343a40;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        tr:hover {
+            background-color: #e9ecef;
+        }
+        .currency {
+            text-align: right;
+            font-family: monospace;
+        }
+        .datetime-display {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #495057;
+        }
+
+        button.keypad-btn:hover {
+            background: #e9ecef !important;
+            transform: scale(1.05);
+        }
+
+        /* Style untuk text input terakhir */
+        .input-terakhir {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        
+        .input-terakhir-item {
+            font-size: 13px;
+            color: #495057;
+            font-weight: bold;
+        }
+
+        /* Debug info */
+        .debug-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 9px;
+            color: #856404;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                top: 10px !important;
+                left: 10px !important;
+            }
+
+            .container {
+                margin: 70px 5px 5px 5px;
+                width: calc(100% - 10px);
+                padding: 10px;
+            }
+            
+            .input-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .input-terakhir {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            button:not(.menu-toggle) {
+                width: 100%;
+                margin-left: 0;
+                margin-bottom: 0px;
+            }
+            
+            .datetime-display {
+                font-size: 16px;
+                padding: 10px;
+            }
+            
+            th, td {
+                padding: 8px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                margin: 5px;
+            }
+            
+            .container {
+                width: calc(100% - 10px);
+                margin: 60px 0 0 0;
+                padding: 8px;
+            }
+            
+            .input-section {
+                padding: 15px;
+            }
+            
+            th, td {
+                padding: 6px;
+                font-size: 12px;
+            }
+            
+            .datetime-display {
+                font-size: 14px;
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="debug-info" id="debugInfo">
+            Data loaded: 0 items | Counter: 1 | Storage: Unknown
+        </div>
+
+        <div class="input-section">
+            <div class="datetime-display" id="datetimeDisplay">
+                Tanggal: - | Jam: -
+            </div>
+            
+            <!-- Text biasa untuk input terakhir -->
+            <div class="input-terakhir">
+                <div class="input-terakhir-item" id="inputBelanjaText">💰 Tunai Terakhir: Rp 0</div>
+                <div class="input-terakhir-item" id="inputCashoutText">💸 Cash Out Terakhir: Rp 0</div>
+            </div>
+            
+            <div class="input-row">
+                <div class="input-group">
+                <input type="text" id="totalBelanja" placeholder="0" oninput="formatInputValue(this)">
+                </div>
+            </div>
+            
+            <!-- Keypad Angka -->
+            <div class="keypad-container" style="background: white; padding: 15px; border-radius: 8px; margin-top: -10px; border: 1px solid #ddd;">
+                <div class="keypad-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%;">
+                    <button class="keypad-btn" onclick="inputAngka('1')" style="padding: 15px; font-size: 18px; font-weight: bold; background: #f8f9fa; color: black; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">1</button>
+                    <button class="keypad-btn" onclick="inputAngka('2')" style="padding: 15px; font-size: 18px; font-weight: bold; background: #f8f9fa; color: black; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">2</button>
+                    <button class="keypad-btn" onclick="inputAngka('3')" style="padding: 15px; font-size: 18px; font-weight: bold; background: #f8f9fa; color: black; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">3</button>
+                    <button class="keypad-btn" onclick="inputAngka('4')" style="padding: 15px; font-size: 18px; font-weight: bold; background: #f8f9fa; color: black; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">4</button>
+                    <button class="keypad-btn" onclick="inputAngka('5')" style="padding: 15px; font-size: 18px; font-weight: bold; background: #f8f9fa; color: black; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">5</button>
+                    <button class="keypad-btn" onclick="inputAngka('6')" style="padding: 15px; font-size: 18px; font-weight: bold; background: #f8f9fa; color: black; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">6</button>
+                    <button class="keypad-btn" onclick="inputAngka('7')" style="padding: 15px; font-size: 18px; font-weight: bold; background: #f8f9fa; color: black; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">7</button>
+                    <button class="keypad-btn" onclick="inputAngka('8')" style="padding: 15px; font-size: 18px; font-weight: bold; background: #f8f9fa; color: black; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">8</button>
+                    <button class="keypad-btn" onclick="inputAngka('9')" style="padding: 15px; font-size: 18px; font-weight: bold; background: #f8f9fa; color: black; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">9</button>
+                    <button class="keypad-btn" onclick="inputAngka('000')" style="padding: 15px; font-size: 16px; font-weight: bold; background: #e9ecef; color: black; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">000</button>
+                    <button class="keypad-btn" onclick="inputAngka('0')" style="padding: 15px; font-size: 18px; font-weight: bold; background: #f8f9fa; color: black; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">0</button>
+                    <button class="keypad-btn" onclick="hapusAngka()" style="padding: 15px; font-size: 16px; font-weight: bold; background: #dc3545; color: white; border: 1px solid #dc3545; border-radius: 5px; cursor: pointer;">⌫</button>
+                </div>
+            </div>
+            <div class="input-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <button onclick="tambahData('Tunai')" style="background: white; color: black; border: 1px solid #ddd; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold;">💰 Tunai</button>
+                <button onclick="tambahData('Cash Out')" style="background: white; color: black; border: 1px solid #ddd; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold;">💸 Cash Out</button>
+            </div>
+        </div>
+
+        <!-- Tabel Total Keseluruhan -->
+        <table id="tabelTotal" style="margin-bottom: 20px;">
+            <tbody>
+                <!-- Total akan ditambahkan di sini -->
+            </tbody>
+        </table>
+
+        <table id="tabelData">
+            <thead>
+                <tr style="background: white;">
+                    <th style="background: white; color: black;">No</th>
+                    <th style="background: white; color: black;">Tanggal</th>
+                    <th style="background: white; color: black;">Jam</th>
+                    <th style="background: white; color: black;">Total</th>
+                    <th style="background: white; color: black;">Cash Out</th>
+                    <th style="background: white; color: black;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data akan ditambahkan di sini -->
+            </tbody>
+        </table>
+        
+        <!-- Jarak pemisah yang sangat besar agar benar-benar tidak terlihat di layar HP -->
+        <div style="margin-top: 800px; margin-bottom: 50px; text-align: center; padding: 30px; background: #fff3cd; border: 2px solid #ffeaa7; border-radius: 10px;">
+            <button class="reset" onclick="resetData()" style="background: #dc3545; color: white; border: none; padding: 15px 30px; font-size: 16px; font-weight: bold; border-radius: 8px;">🗑️ Reset Semua Data</button>
+            <div style="margin-top: 15px; font-size: 14px; color: #856404; font-weight: bold;">
+                ⚠️ PERINGATAN: Tindakan ini akan menghapus semua data dan tidak dapat dibatalkan!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let dataTransaksi = [];
+        let counter = 1;
+        let storageMethod = 'unknown';
+
+        // Multiple storage methods with fallback
+        const Storage = {
+            // Method 1: Try localStorage (primary)
+            saveToLocalStorage: function(data) {
+                try {
+                    localStorage.setItem('belanja_data', JSON.stringify(data));
+                    return true;
+                } catch (e) {
+                    console.log('localStorage failed:', e.message);
+                    return false;
+                }
+            },
+
+            loadFromLocalStorage: function() {
+                try {
+                    const data = localStorage.getItem('belanja_data');
+                    return data ? JSON.parse(data) : null;
+                } catch (e) {
+                    console.log('localStorage read failed:', e.message);
+                    return null;
+                }
+            },
+
+            clearLocalStorage: function() {
+                try {
+                    localStorage.removeItem('belanja_data');
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            },
+
+            // Method 2: Cookie fallback (with compression)
+            saveToCookie: function(data) {
+                try {
+                    const dataString = JSON.stringify(data);
+                    // Check cookie size limit (4KB)
+                    if (dataString.length > 3000) {
+                        console.log('Data too large for cookie storage');
+                        return false;
+                    }
+                    document.cookie = `belanja_data=${encodeURIComponent(dataString)}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; SameSite=Lax`;
+                    return true;
+                } catch (e) {
+                    console.log('Cookie save failed:', e.message);
+                    return false;
+                }
+            },
+
+            loadFromCookie: function() {
+                try {
+                    const cookies = document.cookie.split(';');
+                    for (let cookie of cookies) {
+                        const [key, value] = cookie.trim().split('=');
+                        if (key === 'belanja_data' && value) {
+                            return JSON.parse(decodeURIComponent(value));
+                        }
+                    }
+                    return null;
+                } catch (e) {
+                    console.log('Cookie read failed:', e.message);
+                    return null;
+                }
+            },
+
+            clearCookie: function() {
+                try {
+                    document.cookie = 'belanja_data=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            },
+
+            // Method 3: In-memory with session persistence
+            saveToMemory: function(data) {
+                try {
+                    window.belanjaData = data;
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            },
+
+            loadFromMemory: function() {
+                try {
+                    return window.belanjaData || null;
+                } catch (e) {
+                    return null;
+                }
+            },
+
+            clearMemory: function() {
+                try {
+                    delete window.belanjaData;
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+        };
+
+        // Unified storage interface
+        function saveData() {
+            const data = {
+                dataTransaksi: dataTransaksi,
+                counter: counter,
+                timestamp: Date.now()
+            };
+
+            let saved = false;
+            
+            // Try localStorage first
+            if (!saved && Storage.saveToLocalStorage(data)) {
+                storageMethod = 'localStorage';
+                saved = true;
+            }
+            
+            // Try cookie as fallback
+            if (!saved && Storage.saveToCookie(data)) {
+                storageMethod = 'cookie';
+                saved = true;
+            }
+            
+            // Always save to memory as final fallback
+            if (Storage.saveToMemory(data)) {
+                if (!saved) {
+                    storageMethod = 'memory';
+                }
+                saved = true;
+            }
+
+            updateDebugInfo();
+            
+            if (saved) {
+                console.log(`Data saved using ${storageMethod}`);
+            } else {
+                console.log('Failed to save data');
+            }
+            
+            return saved;
+        }
+
+        function loadData() {
+            let data = null;
+            
+            // Try localStorage first
+            data = Storage.loadFromLocalStorage();
+            if (data) {
+                storageMethod = 'localStorage';
+            }
+            
+            // Try cookie if localStorage failed
+            if (!data) {
+                data = Storage.loadFromCookie();
+                if (data) {
+                    storageMethod = 'cookie';
+                }
+            }
+            
+            // Try memory as final fallback
+            if (!data) {
+                data = Storage.loadFromMemory();
+                if (data) {
+                    storageMethod = 'memory';
+                }
+            }
+
+            if (data && data.dataTransaksi && Array.isArray(data.dataTransaksi)) {
+                dataTransaksi = data.dataTransaksi;
+                counter = data.counter || 1;
+                
+                // Validate data integrity
+                if (dataTransaksi.length > 0) {
+                    // Fix counter if needed
+                    const maxNo = Math.max(...dataTransaksi.map(item => item.no || 0));
+                    if (counter <= maxNo) {
+                        counter = maxNo + 1;
+                    }
+                    
+                    // Update text terakhir berdasarkan transaksi terakhir
+                    const transaksiTerakhir = dataTransaksi[dataTransaksi.length - 1];
+                    if (transaksiTerakhir) {
+                        const jenis = transaksiTerakhir.isCashOut ? 'Cash Out' : 'Tunai';
+                        const nilai = Math.abs(transaksiTerakhir.totalBelanja);
+                        updateTextTerakhir(jenis, nilai);
+                    }
+                }
+                
+                tampilkanData();
+                updateDebugInfo();
+                console.log(`Data loaded using ${storageMethod}: ${dataTransaksi.length} items`);
+                return true;
+            }
+            
+            storageMethod = 'none';
+            updateDebugInfo();
+            console.log('No data found in any storage method');
+            return false;
+        }
+
+        function clearData() {
+            Storage.clearLocalStorage();
+            Storage.clearCookie();
+            Storage.clearMemory();
+            
+            dataTransaksi = [];
+            counter = 1;
+            storageMethod = 'none';
+            updateDebugInfo();
+            console.log('All data cleared from all storage methods');
+        }
+
+        function updateDebugInfo() {
+            const debugElement = document.getElementById('debugInfo');
+            if (debugElement) {
+                const dataSize = JSON.stringify({dataTransaksi, counter}).length;
+                debugElement.textContent = `Data loaded: ${dataTransaksi.length} items | Counter: ${counter} | Storage: ${storageMethod} | Size: ${dataSize} bytes`;
+            }
+        }
+
+        // Set tanggal dan jam otomatis saat halaman dimuat
+        window.onload = function() {
+            console.log('Page loaded, initializing...');
+            setCurrentDateTime();
+            
+            // Load data from storage
+            const loaded = loadData();
+            if (loaded) {
+                console.log(`Successfully loaded ${dataTransaksi.length} existing records`);
+            } else {
+                console.log('Starting with fresh data');
+            }
+            
+            updateDebugInfo();
+        }
+
+        function setCurrentDateTime() {
+            const now = new Date();
+            const tanggal = now.toLocaleDateString('id-ID');
+            const jam = now.toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'});
+            document.getElementById('datetimeDisplay').textContent = `Tanggal: ${tanggal} | Jam: ${jam}`;
+            return { tanggal, jam };
+        }
+
+        function tambahData(jenis) {
+            console.log(`Attempting to add ${jenis} transaction...`);
+            
+            const { tanggal, jam } = setCurrentDateTime();
+            const totalBelanja = parseFloat(unformatRupiah(document.getElementById('totalBelanja').value)) || 0;
+
+            if (totalBelanja <= 0) {
+                alert('Total harus lebih dari 0!');
+                return;
+            }
+
+            // Untuk cash out, jadikan negatif
+            const nilaiTransaksi = jenis === 'Cash Out' ? -totalBelanja : totalBelanja;
+
+            const transaksi = {
+                no: counter,
+                tanggal: tanggal,
+                jam: jam,
+                totalBelanja: nilaiTransaksi,
+                isCashOut: jenis === 'Cash Out',
+                id: Date.now() + Math.random() // Unique ID
+            };
+
+            dataTransaksi.push(transaksi);
+            counter++;
+            
+            console.log(`Transaction added. New count: ${dataTransaksi.length}`);
+            
+            // Update text terakhir berdasarkan jenis
+            updateTextTerakhir(jenis, totalBelanja);
+            
+            tampilkanData();
+            
+            // Save data
+            const saved = saveData();
+            if (!saved) {
+                console.warn('Failed to save data after adding transaction');
+                alert('Peringatan: Data mungkin tidak tersimpan dengan benar');
+            }
+
+            // Reset input
+            document.getElementById('totalBelanja').value = '';
+            
+            updateDebugInfo();
+        }
+
+        function updateTextTerakhir(jenis, nilai) {
+            const textBelanja = document.getElementById('inputBelanjaText');
+            const textCashout = document.getElementById('inputCashoutText');
+            
+            if (jenis === 'Tunai') {
+                textBelanja.textContent = `💰 Tunai Terakhir: Rp ${nilai.toLocaleString('id-ID')}`;
+                textCashout.textContent = `💸 Cash Out Terakhir: Rp 0`;
+            } else if (jenis === 'Cash Out') {
+                textCashout.textContent = `💸 Cash Out Terakhir: Rp ${nilai.toLocaleString('id-ID')}`;
+                textBelanja.textContent = `💰 Tunai Terakhir: Rp 0`;
+            }
+        }
+
+        function hapusData(index) {
+            if (confirm('Yakin ingin menghapus data ini?')) {
+                console.log(`Deleting transaction at index ${index}`);
+                
+                if (index >= 0 && index < dataTransaksi.length) {
+                    dataTransaksi.splice(index, 1);
+                    console.log(`Transaction deleted. New count: ${dataTransaksi.length}`);
+                    
+                    tampilkanData();
+                    
+                    // Save data
+                    const saved = saveData();
+                    if (!saved) {
+                        console.warn('Failed to save data after deleting transaction');
+                        alert('Peringatan: Data mungkin tidak tersimpan dengan benar');
+                    }
+                    
+                    updateDebugInfo();
+                } else {
+                    console.error(`Invalid index for deletion: ${index}`);
+                    alert('Error: Data tidak valid untuk dihapus');
+                }
+            }
+        }
+
+        function tampilkanData() {
+            const tbody = document.querySelector('#tabelData tbody');
+            const totalTbody = document.querySelector('#tabelTotal tbody');
+            
+            tbody.innerHTML = '';
+            totalTbody.innerHTML = '';
+
+            console.log(`Displaying ${dataTransaksi.length} transactions`);
+
+            // Tampilkan total di tabel terpisah di atas (hanya jika ada data)
+            if (dataTransaksi.length > 0) {
+                const totalRow = totalTbody.insertRow();
+                totalRow.className = 'total-row';
+                const totalAkhir = dataTransaksi.reduce((sum, item) => sum + item.totalBelanja, 0);
+                totalRow.innerHTML = `
+                    <td style="text-align: right; font-weight: bold; background-color: white; color: black; padding: 10px;">TOTAL KESELURUHAN:</td>
+                    <td class="currency" style="background-color: white; color: black; font-weight: bold; padding: 10px;">Rp ${totalAkhir.toLocaleString('id-ID')}</td>
+                `;
+            }
+
+            // Tampilkan data dalam urutan terbalik (data terbaru di atas)
+            const dataReversed = [...dataTransaksi].reverse();
+            dataReversed.forEach((transaksi, reversedIndex) => {
+                const originalIndex = dataTransaksi.length - 1 - reversedIndex;
+                const row = tbody.insertRow();
+                const cellClass = 'style="background-color: white; color: black;"';
+                
+                row.innerHTML = `
+                    <td ${cellClass}>${transaksi.no}</td>
+                    <td ${cellClass}>${transaksi.tanggal}</td>
+                    <td ${cellClass}>${transaksi.jam}</td>
+                    <td ${cellClass} class="currency">${transaksi.isCashOut ? '-' : 'Rp ' + Math.abs(transaksi.totalBelanja).toLocaleString('id-ID')}</td>
+                    <td ${cellClass} class="currency">${transaksi.isCashOut ? 'Rp ' + Math.abs(transaksi.totalBelanja).toLocaleString('id-ID') : '-'}</td>
+                    <td ${cellClass}><button onclick="hapusData(${originalIndex})" style="background: white; color: black; border: 1px solid #ddd; padding: 5px 10px; border-radius: 3px; cursor: pointer;">🗑️</button></td>
+                `;
+            });
+        }
+
+        // Fungsi untuk format angka dengan titik pemisah ribuan
+        function formatRupiah(angka) {
+            return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        // Fungsi untuk menghapus format dan ambil angka saja
+        function unformatRupiah(formatted) {
+            return formatted.replace(/\./g, '');
+        }
+
+        // Fungsi untuk memformat input saat mengetik
+        function formatInputValue(input) {
+            let value = input.value.replace(/\./g, '');
+            if (value) {
+                input.value = formatRupiah(value);
+            }
+        }
+
+        // Fungsi untuk keypad angka
+        function inputAngka(angka) {
+            const input = document.getElementById('totalBelanja');
+            let currentValue = unformatRupiah(input.value || '0');
+            
+            if (currentValue === '0' || currentValue === '') {
+                currentValue = angka;
+            } else {
+                currentValue = currentValue + angka;
+            }
+            
+            input.value = formatRupiah(currentValue);
+        }
+
+        function hapusAngka() {
+            const input = document.getElementById('totalBelanja');
+            let currentValue = unformatRupiah(input.value || '');
+            
+            if (currentValue.length > 1) {
+                currentValue = currentValue.slice(0, -1);
+                input.value = formatRupiah(currentValue);
+            } else {
+                input.value = '';
+            }
+        }
+
+        function clearInput() {
+            const input = document.getElementById('totalBelanja');
+            input.value = '';
+        }
+
+        function resetData() {
+            if (confirm('Yakin ingin menghapus semua data?')) {
+                console.log('Resetting all data...');
+                clearData();
+                tampilkanData();
+                updateDebugInfo();
+                console.log('All data reset successfully');
+            }
+        }
+
+        // Prevent data loss on page unload
+        window.addEventListener('beforeunload', function(e) {
+            if (dataTransaksi.length > 0) {
+                saveData();
+            }
+        });
+
+        // Auto-save every 30 seconds
+        setInterval(function() {
+            if (dataTransaksi.length > 0) {
+                saveData();
+                console.log('Auto-save completed');
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
